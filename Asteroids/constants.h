@@ -4,12 +4,12 @@
 
 #define defaultWindowWidth 800
 #define defaultWindowHeight 600
-
 #define FPS 60
 #define targetFrameTime (1000/FPS)
 
 #define playerSize 8
 #define maxSpeed 5
+#define playerRotationSpeed 4
 #define accelFactor 1
 #define decelFactor 0.01
 
@@ -31,8 +31,10 @@ typedef struct {
 	vector2 vel;
 	vector2 input;
 	float r; //rotation
+	float dr; //is rotation
 	shape shapeType;
 	shape vertecies;
+	int isBurn;
 } player;
 
 //Asteroid "class"

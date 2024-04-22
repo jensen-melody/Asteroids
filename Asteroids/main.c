@@ -10,6 +10,7 @@ SDL_Renderer* renderer = NULL;
 
 int isRunning = false;
 int lastFrameTime = 0;
+float deltaTime;
 
 int difficulty = 0;
 
@@ -78,7 +79,7 @@ if (!renderer) {
 //Sets up the scene
 void setup() {
 	//Player variable setup
-	ship.pos.x = defaultWindowWidth / 2;
+	ship.pos.x = defaultWindowHeight / 2;
 	ship.pos.y = defaultWindowHeight / 2;
 	ship.vel.x = 0;
 	ship.vel.y = 0;
@@ -109,62 +110,60 @@ int processInput() {
 		}
 	}
 
-	//Get mouse position
-	if (event.type == SDL_MOUSEMOTION) {
-		mousePos.x = event.motion.x;
-		mousePos.y = event.motion.y;
-	}
-
 	//If a key was pressed
 	if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
 		//Adjust the input variable
 		switch (event.key.keysym.sym) {
-		case SDLK_w: ship.input.y -= 1; break;
-		case SDLK_s: ship.input.y += 1; break;
-		case SDLK_a: ship.input.x -= 1; break;
-		case SDLK_d: ship.input.x += 1; break;
+		case SDLK_w: ship.isBurn = true; break;
+		case SDLK_a: ship.dr -= 1; break;
+		case SDLK_d: ship.dr += 1; break;
 		}
 	}
 	//If a key was released
 	else if (event.type == SDL_KEYUP && event.key.repeat == 0) {
 		//Adjust the input variable
 		switch (event.key.keysym.sym) {
-		case SDLK_w: ship.input.y += 1; break;
-		case SDLK_s: ship.input.y -= 1; break;
-		case SDLK_a: ship.input.x += 1; break;
-		case SDLK_d: ship.input.x -= 1; break;
+		case SDLK_w: ship.isBurn = false; break;
+		case SDLK_a: ship.dr += 1; break;
+		case SDLK_d: ship.dr -= 1; break;
 		}
 	}
-
-
 }
 
 //Update objects every frame
 void update() {
 	//Wait an amount of time until target FPS reached
+
+	deltaTime = lastFrameTime;
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), lastFrameTime + targetFrameTime));
 	lastFrameTime = SDL_GetTicks();
+	deltaTime = (lastFrameTime - deltaTime)/16;
 
-	//update player velocity
-	ship.vel.x += accelFactor * ship.input.x;
-	ship.vel.y += accelFactor * ship.input.y;
+	//update player rotation
+	ship.r += ship.dr * playerRotationSpeed * deltaTime;
+	if (ship.r >= 360) {
+		ship.r -= 360;
+	}
+	else if (ship.r < 0) {
+		ship.r += 360;
+	}
 
-	if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) > maxSpeed) {
-		ship.vel.x = maxSpeed;
-		ship.vel.y = maxSpeed;
+	/*if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < maxSpeed) {
+		ship.vel.x += accelFactor * ship.input.x;
+		ship.vel.y += accelFactor * ship.input.y;
 	}
 
 	ship.vel.x *= 1-decelFactor;
 	ship.vel.y *= 1-decelFactor;
 
-	if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < 0.5) {
+	if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < 0.1) {
 		ship.vel.x = 0;
 		ship.vel.y = 0;
-	}
+	}*/
 
-	//update positions
-	ship.pos.x += ship.vel.x;
-	ship.pos.y += ship.vel.y;
+	////update positions
+	//ship.pos.x += ship.vel.x;
+	//ship.pos.y += ship.vel.y;
 
 	//printf("(%f, %f) (%f, %f)\n", ship.pos.x, ship.pos.y, ship.vel.x, ship.vel.y);
 }
@@ -195,10 +194,7 @@ void render() {
 	}
 
 	//Do same for player
-	vector2 dMousePos = {mousePos.x - ship.pos.x, mousePos.y - ship.pos.y};
-	
-	//calculate vertecies
-	ship.vertecies = calcVertecies(ship.shapeType, -atan2(dMousePos.y,dMousePos.x) + 1.571, ship.pos, 1);
+	ship.vertecies = calcVertecies(ship.shapeType, ship.r * 3.14/180, ship.pos, 1);
 
 	//set color to white
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
