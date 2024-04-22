@@ -13,6 +13,8 @@
 #define accelFactor 1
 #define decelFactor 0.01
 
+#define maxAsteroidSpeed 4
+
 //Variable type that holds 2 dimentional information
 typedef struct {
 	float x;
@@ -29,7 +31,6 @@ typedef struct {
 typedef struct {
 	vector2 pos;
 	vector2 vel;
-	vector2 input;
 	float r; //rotation
 	float dr; //is rotation
 	shape shapeType;

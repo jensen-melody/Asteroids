@@ -8,6 +8,9 @@
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
+int windowWidth = defaultWindowWidth;
+int windowHeight = defaultWindowHeight;
+
 int isRunning = false;
 int lastFrameTime = 0;
 float deltaTime;
@@ -79,8 +82,8 @@ if (!renderer) {
 //Sets up the scene
 void setup() {
 	//Player variable setup
-	ship.pos.x = defaultWindowHeight / 2;
-	ship.pos.y = defaultWindowHeight / 2;
+	ship.pos.x = windowWidth / 2;
+	ship.pos.y = windowHeight / 2;
 	ship.vel.x = 0;
 	ship.vel.y = 0;
 	ship.shapeType.numVertecies = 4;
@@ -88,6 +91,36 @@ void setup() {
 		ship.shapeType.vertecies[i] = shipVertecies[i];
 	}
 	ship.r = 0;
+
+	//Setup Asteroids
+	for (int i = 0; i < (difficulty + 4)*4; i += 4) {
+		asteroids[i].alive = true;
+		asteroids[i].pos.x = rand() % windowWidth;
+		asteroids[i].pos.y = rand() % windowHeight;
+		asteroids[i].r = rand() % 360;
+		int type = rand() % 3;
+		if (type == 0) {
+			asteroids[i].shapeType.numVertecies = 11;
+			for (int j = 0; j < 11; j++) {
+				asteroids[i].shapeType.vertecies[j] = asteroid1Vertecies[j];
+			}
+		}
+		else if (type == 1) {
+			asteroids[i].shapeType.numVertecies = 12;
+			for (int j = 0; j < 12; j++) {
+				asteroids[i].shapeType.vertecies[j] = asteroid2Vertecies[j];
+			}
+		}
+		else if (type == 2) {
+			asteroids[i].shapeType.numVertecies = 12;
+			for (int j = 0; j < 12; j++) {
+				asteroids[i].shapeType.vertecies[j] = asteroid3Vertecies[j];
+			}
+		}
+		asteroids[i].size = 3;
+		asteroids[i].vel.x = (rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed;
+		asteroids[i].vel.y = (rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed;
+	}
 }
 
 //Takes and processes inputs
@@ -148,24 +181,45 @@ void update() {
 		ship.r += 360;
 	}
 
-	/*if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < maxSpeed) {
-		ship.vel.x += accelFactor * ship.input.x;
-		ship.vel.y += accelFactor * ship.input.y;
+	//Teleport asteroid to opposite side of screen if offscreen
+	for (int i = 0; i < 48; i++) {
+		/*if (asteroids[i].pos.x > windowWidth + (sqrt(2*pow(playerSize * asteroids[i].size / 2,2)))) {
+			asteroids[i].pos.x = 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
+		}
+		else if (asteroids[i].pos.x < 0  - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
+			asteroids[i].pos.x = windowWidth + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
+		}
+
+		if (asteroids[i].pos.y > windowHeight + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
+			asteroids[i].pos.y = 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
+		}
+		else if (asteroids[i].pos.y < 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
+			asteroids[i].pos.y = windowHeight + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
+		}*/
+
+		if (asteroids[i].pos.x > windowWidth + 40) {
+			asteroids[i].pos.x = 0 - 40;
+		}
+		else if (asteroids[i].pos.x < 0 - 40) {
+			asteroids[i].pos.x = windowWidth + 40;
+		}
+
+		if (asteroids[i].pos.y > windowHeight + 40) {
+			asteroids[i].pos.y = 0 - 40;
+		}
+		else if (asteroids[i].pos.y < 0 - 40) {
+			asteroids[i].pos.y = windowHeight + 40;
+		}
 	}
 
-	ship.vel.x *= 1-decelFactor;
-	ship.vel.y *= 1-decelFactor;
-
-	if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < 0.1) {
-		ship.vel.x = 0;
-		ship.vel.y = 0;
-	}*/
-
 	////update positions
-	//ship.pos.x += ship.vel.x;
-	//ship.pos.y += ship.vel.y;
+	ship.pos.x += ship.vel.x * deltaTime;
+	ship.pos.y += ship.vel.y * deltaTime;
 
-	//printf("(%f, %f) (%f, %f)\n", ship.pos.x, ship.pos.y, ship.vel.x, ship.vel.y);
+	for (int i = 0; i < 48; i++) {
+		asteroids[i].pos.x += asteroids[i].vel.x * deltaTime;
+		asteroids[i].pos.y += asteroids[i].vel.y * deltaTime;
+	}
 }
 
 //Tell renderer to show objects on screen
@@ -218,6 +272,8 @@ void destroyWindow() {
 
 //Main function
 int main(int argc, char* argv[]) {
+	//initialize RNG
+	srand(time(NULL));
 
 	//Set isRunning variable to if window initizalized
 	int isRunning = initializeWindow();
