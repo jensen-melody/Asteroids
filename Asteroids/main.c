@@ -181,6 +181,11 @@ void update() {
 		ship.r += 360;
 	}
 
+	//forwards force
+	if (ship.isBurn) {
+		//TODO
+	}
+
 	//Teleport asteroid to opposite side of screen if offscreen
 	for (int i = 0; i < 48; i++) {
 		/*if (asteroids[i].pos.x > windowWidth + (sqrt(2*pow(playerSize * asteroids[i].size / 2,2)))) {
