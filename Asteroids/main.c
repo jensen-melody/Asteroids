@@ -182,25 +182,21 @@ void update() {
 	}
 
 	//forwards force
-	if (ship.isBurn) {
-		//TODO
+	if (ship.isBurn && sqrt(pow(ship.vel.x,2)+pow(ship.vel.y,2)) <= maxSpeed ) {
+		ship.vel.x += accelFactor * sin(ship.r * 3.14 / 180) * deltaTime;
+		ship.vel.y += accelFactor * cos(ship.r * 3.14 / 180) * deltaTime;
+	}
+
+	ship.vel.x *= decelFactor;
+	ship.vel.y *= decelFactor;
+
+	if (sqrt(pow(ship.vel.x, 2) + pow(ship.vel.y, 2)) < 0.1) {
+		ship.vel.x = 0;
+		ship.vel.y = 0;
 	}
 
 	//Teleport asteroid to opposite side of screen if offscreen
 	for (int i = 0; i < 48; i++) {
-		/*if (asteroids[i].pos.x > windowWidth + (sqrt(2*pow(playerSize * asteroids[i].size / 2,2)))) {
-			asteroids[i].pos.x = 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
-		}
-		else if (asteroids[i].pos.x < 0  - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
-			asteroids[i].pos.x = windowWidth + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
-		}
-
-		if (asteroids[i].pos.y > windowHeight + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
-			asteroids[i].pos.y = 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
-		}
-		else if (asteroids[i].pos.y < 0 - (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)))) {
-			asteroids[i].pos.y = windowHeight + (sqrt(2 * pow(playerSize * asteroids[i].size / 2, 2)));
-		}*/
 
 		if (asteroids[i].pos.x > windowWidth + 40) {
 			asteroids[i].pos.x = 0 - 40;
@@ -215,6 +211,20 @@ void update() {
 		else if (asteroids[i].pos.y < 0 - 40) {
 			asteroids[i].pos.y = windowHeight + 40;
 		}
+	}
+
+	if (ship.pos.x > windowWidth + 40) {
+		ship.pos.x = 0 - 40;
+	}
+	else if (ship.pos.x < 0 - 40) {
+		ship.pos.x = windowWidth + 40;
+	}
+
+	if (ship.pos.y > windowHeight + 40) {
+		ship.pos.y = 0 - 40;
+	}
+	else if (ship.pos.y < 0 - 40) {
+		ship.pos.y = windowHeight + 40;
 	}
 
 	////update positions

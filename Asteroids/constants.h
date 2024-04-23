@@ -4,14 +4,14 @@
 
 #define defaultWindowWidth 800
 #define defaultWindowHeight 600
-#define FPS 60
+#define FPS 30
 #define targetFrameTime (1000/FPS)
 
 #define playerSize 8
-#define maxSpeed 5
+#define maxSpeed 8
 #define playerRotationSpeed 4
-#define accelFactor 1
-#define decelFactor 0.01
+#define accelFactor 0.8
+#define decelFactor 0.98
 
 #define maxAsteroidSpeed 4
 
