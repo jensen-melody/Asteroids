@@ -10,8 +10,8 @@
 #define playerSize 8
 #define maxSpeed 8
 #define playerRotationSpeed 4
-#define accelFactor 0.8
-#define decelFactor 0.98
+#define accelFactor 0.75
+#define decelFactor 0.97
 
 #define maxAsteroidSpeed 4
 
@@ -53,6 +53,7 @@ typedef struct {
 typedef struct {
 	vector2 pos;
 	vector2 vel;
+	int alive;
 } boolet;
 
 //vertecies of the ship relative to ship center

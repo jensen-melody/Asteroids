@@ -98,24 +98,25 @@ void setup() {
 		asteroids[i].pos.x = rand() % windowWidth;
 		asteroids[i].pos.y = rand() % windowHeight;
 		asteroids[i].r = rand() % 360;
-		int type = rand() % 3;
-		if (type == 0) {
+		switch (rand()%3) {
+		case 0: 
 			asteroids[i].shapeType.numVertecies = 11;
 			for (int j = 0; j < 11; j++) {
 				asteroids[i].shapeType.vertecies[j] = asteroid1Vertecies[j];
 			}
-		}
-		else if (type == 1) {
+			break;
+		case 1:
 			asteroids[i].shapeType.numVertecies = 12;
 			for (int j = 0; j < 12; j++) {
 				asteroids[i].shapeType.vertecies[j] = asteroid2Vertecies[j];
 			}
-		}
-		else if (type == 2) {
+			break;
+		case 2:
 			asteroids[i].shapeType.numVertecies = 12;
 			for (int j = 0; j < 12; j++) {
 				asteroids[i].shapeType.vertecies[j] = asteroid3Vertecies[j];
 			}
+			break;
 		}
 		asteroids[i].size = 3;
 		asteroids[i].vel.x = (rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed;
@@ -147,18 +148,24 @@ int processInput() {
 	if (event.type == SDL_KEYDOWN && event.key.repeat == 0) {
 		//Adjust the input variable
 		switch (event.key.keysym.sym) {
-		case SDLK_w: ship.isBurn = true; break;
-		case SDLK_a: ship.dr -= 1; break;
-		case SDLK_d: ship.dr += 1; break;
+		//case SDLK_w: ship.isBurn = true; break;
+		case SDLK_UP: ship.isBurn = true; break;
+		//case SDLK_a: ship.dr += 1; break;
+		case SDLK_LEFT: ship.dr += 1; break;
+		//case SDLK_d: ship.dr -= 1; break;
+		case SDLK_RIGHT: ship.dr -= 1; break;
 		}
 	}
 	//If a key was released
 	else if (event.type == SDL_KEYUP && event.key.repeat == 0) {
 		//Adjust the input variable
 		switch (event.key.keysym.sym) {
-		case SDLK_w: ship.isBurn = false; break;
-		case SDLK_a: ship.dr += 1; break;
-		case SDLK_d: ship.dr -= 1; break;
+		//case SDLK_w: ship.isBurn = false; break;
+		case SDLK_UP: ship.isBurn = false; break;
+		//case SDLK_a: ship.dr -= 1; break;
+		case SDLK_LEFT: ship.dr -= 1; break;
+		//case SDLK_d: ship.dr += 1; break;
+		case SDLK_RIGHT: ship.dr += 1; break;
 		}
 	}
 }
