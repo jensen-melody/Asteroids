@@ -18,6 +18,8 @@ float deltaTime;
 int difficulty = 0;
 
 asteroid asteroids[48]; //up to 12 total starting asteroids (level 8)
+boolet bullets[48];
+
 player ship;
 
 vector2 mousePos;
@@ -55,13 +57,13 @@ int initializeWindow(void) {
 	);
 
 	//Set window to fullscreen
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 	//Get fullscreen size and set windowWidth/Height to it
-	/*SDL_DisplayMode DM;
+	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	windowWidth = DM.w;
-	windowHeight = DM.h;*/
+	windowHeight = DM.h;
 
 	//Checks if window initialized correctly
 if (!window) {
@@ -90,7 +92,7 @@ void setup() {
 	for (int i = 0; i < 4; i++) {
 		ship.shapeType.vertecies[i] = shipVertecies[i];
 	}
-	ship.r = 0;
+	ship.r = 180;
 
 	//Setup Asteroids
 	for (int i = 0; i < (difficulty + 4)*4; i += 4) {

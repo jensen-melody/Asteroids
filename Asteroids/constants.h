@@ -13,6 +13,8 @@
 #define accelFactor 0.75
 #define decelFactor 0.97
 
+#define maxBulletTime 120
+
 #define maxAsteroidSpeed 4
 
 //Variable type that holds 2 dimentional information
