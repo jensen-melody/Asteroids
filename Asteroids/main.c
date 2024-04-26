@@ -17,8 +17,8 @@ float deltaTime;
 
 int difficulty = 0;
 
-asteroid asteroids[48]; //up to 12 total starting asteroids (level 8)
-boolet bullets[48];
+asteroid asteroids[maxNumAsteroid]; //up to 12 total starting asteroids (level 8)
+boolet bullets[maxNumBullets];
 
 player ship;
 
@@ -95,7 +95,7 @@ void setup() {
 	ship.r = 180;
 
 	//Setup Asteroids
-	for (int i = 0; i < (difficulty + 4)*4; i += 4) {
+	for (int i = 0; i < difficulty * 4 + 16; i += 4) {
 		asteroids[i].alive = true;
 		asteroids[i].pos.x = rand() % windowWidth;
 		asteroids[i].pos.y = rand() % windowHeight;
@@ -124,6 +124,11 @@ void setup() {
 		asteroids[i].vel.x = (rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed;
 		asteroids[i].vel.y = (rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed;
 	}
+
+	//set bullet array to not alive
+	for (int i = 0; i < maxNumBullets; i++) {
+		bullets[i].alive = false;
+	}
 }
 
 //Takes and processes inputs
@@ -144,6 +149,11 @@ int processInput() {
 		if (event.key.keysym.sym == SDLK_ESCAPE) {
 			return false;
 		}
+	}
+
+	//shoot bullet
+	if (event.type == SDL_KEYDOWN && event.key.repeat == 0 && event.key.keysym.sym == SDLK_SPACE) {
+
 	}
 
 	//If a key was pressed
@@ -168,6 +178,7 @@ int processInput() {
 		case SDLK_LEFT: ship.dr -= 1; break;
 		//case SDLK_d: ship.dr += 1; break;
 		case SDLK_RIGHT: ship.dr += 1; break;
+		case SDLK_SPACE: shoot(); break;
 		}
 	}
 }
@@ -205,7 +216,7 @@ void update() {
 	}
 
 	//Teleport asteroid to opposite side of screen if offscreen
-	for (int i = 0; i < 48; i++) {
+	for (int i = 0; i < maxNumAsteroid; i++) {
 
 		if (asteroids[i].pos.x > windowWidth + 40) {
 			asteroids[i].pos.x = 0 - 40;
@@ -240,7 +251,7 @@ void update() {
 	ship.pos.x += ship.vel.x * deltaTime;
 	ship.pos.y += ship.vel.y * deltaTime;
 
-	for (int i = 0; i < 48; i++) {
+	for (int i = 0; i < maxNumAsteroid; i++) {
 		asteroids[i].pos.x += asteroids[i].vel.x * deltaTime;
 		asteroids[i].pos.y += asteroids[i].vel.y * deltaTime;
 	}
@@ -255,7 +266,7 @@ void render() {
 	SDL_RenderClear(renderer);
 
 	//Loop through every asteroid
-	for (int i = 0; i < 48; i++) {
+	for (int i = 0; i < maxNumAsteroid; i++) {
 		//calculate vertecies
 		asteroids[i].vertecies = calcVertecies(asteroids[i].shapeType, asteroids[i].r * 3.1415 / 180, asteroids[i].pos, asteroids[i].size/2);
 
@@ -292,6 +303,15 @@ void destroyWindow() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+//Shoot bullet
+void shoot() {
+	for (int i = 0; i < maxNumBullets; i++) {
+		if (bullets[i].alive == false) {
+
+		}
+	}
 }
 
 //Main function

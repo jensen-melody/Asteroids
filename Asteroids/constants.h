@@ -13,7 +13,12 @@
 #define accelFactor 0.75
 #define decelFactor 0.97
 
+#define maxDifficulty 8
+#define maxNumAsteroid 16 + maxDifficulty * 4
+#define maxNumBullets 48
+
 #define maxBulletTime 120
+#define bulletSpeed 10
 
 #define maxAsteroidSpeed 4
 
@@ -56,6 +61,7 @@ typedef struct {
 	vector2 pos;
 	vector2 vel;
 	int alive;
+	float lifetime;
 } boolet;
 
 //vertecies of the ship relative to ship center
