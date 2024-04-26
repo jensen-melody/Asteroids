@@ -131,6 +131,21 @@ void setup() {
 	}
 }
 
+//Shoot bullet
+int shoot(void) {
+	for (int i = 0; i < maxNumBullets; i++) {
+		if (bullets[i].alive == false) {
+			bullets[i].pos.x = sin(ship.r * 3.14 / 180) * playerSize * 3 + ship.pos.x;
+			bullets[i].pos.y = cos(ship.r * 3.14 / 180) * playerSize * 3 + ship.pos.y;
+			bullets[i].vel.x = sin(ship.r * 3.14 / 180) * bulletSpeed;
+			bullets[i].vel.y = cos(ship.r * 3.14 / 180) * bulletSpeed;
+			bullets[i].lifetime = 0;
+			bullets[i].alive = true;
+			return 1;
+		}
+	}
+}
+
 //Takes and processes inputs
 int processInput() {
 	//Init events
@@ -215,7 +230,8 @@ void update() {
 		ship.vel.y = 0;
 	}
 
-	//Teleport asteroid to opposite side of screen if offscreen
+	//Teleport objects to opposite side of screen if offscreen
+	//asteroids
 	for (int i = 0; i < maxNumAsteroid; i++) {
 
 		if (asteroids[i].pos.x > windowWidth + 40) {
@@ -233,6 +249,25 @@ void update() {
 		}
 	}
 
+	//bullets
+	for (int i = 0; i < maxNumBullets; i++) {
+
+		if (bullets[i].pos.x > windowWidth + 40) {
+			bullets[i].pos.x = 0 - 40;
+		}
+		else if (bullets[i].pos.x < 0 - 40) {
+			bullets[i].pos.x = windowWidth + 40;
+		}
+
+		if (bullets[i].pos.y > windowHeight + 40) {
+			bullets[i].pos.y = 0 - 40;
+		}
+		else if (bullets[i].pos.y < 0 - 40) {
+			bullets[i].pos.y = windowHeight + 40;
+		}
+	}
+
+	//player
 	if (ship.pos.x > windowWidth + 40) {
 		ship.pos.x = 0 - 40;
 	}
@@ -246,14 +281,34 @@ void update() {
 	else if (ship.pos.y < 0 - 40) {
 		ship.pos.y = windowHeight + 40;
 	}
+	
+	//handle bullet lifetime
+	for (int i = 0; i < maxNumBullets; i++) {
+		if (bullets[i].alive) {
+			bullets[i].lifetime += 1 * deltaTime;
+			if (bullets[i].lifetime > maxBulletTime) {
+				bullets[i].alive = false;
+				bullets[i].pos.x = 0;
+				bullets[i].pos.y = 0;
+				bullets[i].vel.x = 0;
+				bullets[i].vel.y = 0;
+				bullets[i].lifetime = 0;
+			}
+		}
+	}
 
-	////update positions
+	//update positions
 	ship.pos.x += ship.vel.x * deltaTime;
 	ship.pos.y += ship.vel.y * deltaTime;
 
 	for (int i = 0; i < maxNumAsteroid; i++) {
 		asteroids[i].pos.x += asteroids[i].vel.x * deltaTime;
 		asteroids[i].pos.y += asteroids[i].vel.y * deltaTime;
+	}
+
+	for (int i = 0; i < maxNumBullets; i++) {
+		bullets[i].pos.x += bullets[i].vel.x * deltaTime;
+		bullets[i].pos.y += bullets[i].vel.y * deltaTime;
 	}
 }
 
@@ -294,6 +349,15 @@ void render() {
 	}
 	SDL_RenderDrawLine(renderer, ship.vertecies.vertecies[ship.vertecies.numVertecies - 1].x, ship.vertecies.vertecies[ship.vertecies.numVertecies - 1].y, ship.vertecies.vertecies[0].x, ship.vertecies.vertecies[0].y);
 
+	//render bullets
+	SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+	for (int i = 0; i < maxNumBullets; i++) {
+		if (bullets[i].alive) {
+			SDL_Rect bullet = { bullets[i].pos.x-bulletSize/2,bullets[i].pos.y-bulletSize/2, bulletSize, bulletSize };
+			SDL_RenderFillRect(renderer, &bullet);
+		}
+	}
+
 	//Swap buffer frame for current frame (Draws frame)
 	SDL_RenderPresent(renderer);
 }
@@ -303,15 +367,6 @@ void destroyWindow() {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-}
-
-//Shoot bullet
-void shoot() {
-	for (int i = 0; i < maxNumBullets; i++) {
-		if (bullets[i].alive == false) {
-
-		}
-	}
 }
 
 //Main function

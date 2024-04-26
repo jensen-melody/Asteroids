@@ -17,8 +17,9 @@
 #define maxNumAsteroid 16 + maxDifficulty * 4
 #define maxNumBullets 48
 
-#define maxBulletTime 120
+#define maxBulletTime 40
 #define bulletSpeed 10
+#define bulletSize 3
 
 #define maxAsteroidSpeed 4
 
