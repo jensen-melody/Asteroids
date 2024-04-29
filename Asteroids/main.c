@@ -24,6 +24,13 @@ player ship;
 
 vector2 mousePos;
 
+//Distance Calc
+float dist(float x1, float y1, float x2, float y2) {
+	float x = x2 - x1;
+	float y = y2 - y1;
+	return (sqrt(pow(x,2) + pow(y,2)));
+}
+
 //Calculate vertex positions from relative position, global center position, and rotation
 shape calcVertecies(shape vertecies, float r, vector2 center, float size) {
 	shape out;
@@ -56,14 +63,14 @@ int initializeWindow(void) {
 		SDL_WINDOW_ALLOW_HIGHDPI //Flags
 	);
 
-	//Set window to fullscreen
-	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	////Set window to fullscreen
+	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-	//Get fullscreen size and set windowWidth/Height to it
-	SDL_DisplayMode DM;
-	SDL_GetCurrentDisplayMode(0, &DM);
-	windowWidth = DM.w;
-	windowHeight = DM.h;
+	////Get fullscreen size and set windowWidth/Height to it
+	//SDL_DisplayMode DM;
+	//SDL_GetCurrentDisplayMode(0, &DM);
+	//windowWidth = DM.w;
+	//windowHeight = DM.h;
 
 	//Checks if window initialized correctly
 if (!window) {
@@ -137,8 +144,8 @@ int shoot(void) {
 		if (bullets[i].alive == false) {
 			bullets[i].pos.x = sin(ship.r * 3.14 / 180) * playerSize * 3 + ship.pos.x;
 			bullets[i].pos.y = cos(ship.r * 3.14 / 180) * playerSize * 3 + ship.pos.y;
-			bullets[i].vel.x = sin(ship.r * 3.14 / 180) * bulletSpeed;
-			bullets[i].vel.y = cos(ship.r * 3.14 / 180) * bulletSpeed;
+			bullets[i].vel.x = sin(ship.r * 3.14 / 180) * bulletSpeed + ship.vel.x;
+			bullets[i].vel.y = cos(ship.r * 3.14 / 180) * bulletSpeed + ship.vel.y;
 			bullets[i].lifetime = 0;
 			bullets[i].alive = true;
 			return 1;
@@ -293,6 +300,21 @@ void update() {
 				bullets[i].vel.x = 0;
 				bullets[i].vel.y = 0;
 				bullets[i].lifetime = 0;
+			}
+		}
+	}
+
+	//Asteroids destroyer
+	for (int i = 0; i < maxNumBullets; i++) {
+		for (int j = 0; j < maxNumAsteroid; j++) {
+			if (dist(asteroids[j].pos.x, asteroids[j].pos.y, bullets[i].pos.x, bullets[i].pos.y) < 3 * playerSize * asteroids[j].size / 2 && bullets[i].alive == true) {
+				bullets[i].alive = false;
+				bullets[i].pos.x = 9999;
+				bullets[i].pos.y = 9999;
+
+				
+				asteroids[j].alive = false;
+				continue;
 			}
 		}
 	}
