@@ -104,6 +104,10 @@ void setup(diff) {
 		ship.r = 180;
 	}
 
+	for (int i = 0; i < maxNumAsteroid; i++) {
+		asteroids[i].alive = false;
+	}
+
 	//Setup Asteroids
 	for (int i = 0; i < difficulty * 4 + 16; i += 4) {
 		asteroids[i].alive = true;
