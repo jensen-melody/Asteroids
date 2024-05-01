@@ -16,6 +16,7 @@ int lastFrameTime = 0;
 float deltaTime;
 
 int difficulty = 0;
+int lives = initialLives;
 
 asteroid asteroids[maxNumAsteroid]; //up to 12 total starting asteroids (level 8)
 boolet bullets[maxNumBullets];
@@ -63,14 +64,14 @@ int initializeWindow(void) {
 		SDL_WINDOW_ALLOW_HIGHDPI //Flags
 	);
 
-	////Set window to fullscreen
-	//SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	//Set window to fullscreen
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-	////Get fullscreen size and set windowWidth/Height to it
-	//SDL_DisplayMode DM;
-	//SDL_GetCurrentDisplayMode(0, &DM);
-	//windowWidth = DM.w;
-	//windowHeight = DM.h;
+	//Get fullscreen size and set windowWidth/Height to it
+	SDL_DisplayMode DM;
+	SDL_GetCurrentDisplayMode(0, &DM);
+	windowWidth = DM.w;
+	windowHeight = DM.h;
 
 	//Checks if window initialized correctly
 if (!window) {
@@ -89,17 +90,19 @@ if (!renderer) {
 }
 
 //Sets up the scene
-void setup() {
-	//Player variable setup
-	ship.pos.x = windowWidth / 2;
-	ship.pos.y = windowHeight / 2;
-	ship.vel.x = 0;
-	ship.vel.y = 0;
-	ship.shapeType.numVertecies = 4;
-	for (int i = 0; i < 4; i++) {
-		ship.shapeType.vertecies[i] = shipVertecies[i];
+void setup(diff) {
+	if (diff == 0) {
+		//Player variable setup
+		ship.pos.x = windowWidth / 2;
+		ship.pos.y = windowHeight / 2;
+		ship.vel.x = 0;
+		ship.vel.y = 0;
+		ship.shapeType.numVertecies = 4;
+		for (int i = 0; i < 4; i++) {
+			ship.shapeType.vertecies[i] = shipVertecies[i];
+		}
+		ship.r = 180;
 	}
-	ship.r = 180;
 
 	//Setup Asteroids
 	for (int i = 0; i < difficulty * 4 + 16; i += 4) {
@@ -169,7 +172,7 @@ int processInput() {
 	case SDL_KEYDOWN:
 		//If key pressed is Esc
 		if (event.key.keysym.sym == SDLK_ESCAPE) {
-			return false;
+			isRunning = false;
 		}
 	}
 
@@ -307,14 +310,65 @@ void update() {
 	//Asteroids destroyer
 	for (int i = 0; i < maxNumBullets; i++) {
 		for (int j = 0; j < maxNumAsteroid; j++) {
-			if (dist(asteroids[j].pos.x, asteroids[j].pos.y, bullets[i].pos.x, bullets[i].pos.y) < 3 * playerSize * asteroids[j].size / 2 && bullets[i].alive == true) {
+			if (dist(asteroids[j].pos.x, asteroids[j].pos.y, bullets[i].pos.x, bullets[i].pos.y) < 3 * playerSize * asteroids[j].size / 2 && bullets[i].alive == true && asteroids[j].alive == true) {
 				bullets[i].alive = false;
 				bullets[i].pos.x = 9999;
 				bullets[i].pos.y = 9999;
 
-				
-				asteroids[j].alive = false;
+				if (asteroids[j].size == 1) {
+					asteroids[j].alive == false;
+					asteroids[j].pos.x = 9999;
+					asteroids[j].pos.y = 9999;
+					asteroids[j].vel.x = 0;
+					asteroids[j].vel.y = 0;
+				}
+				else {
+					//temp variables so they dont get overwritten
+					int size = asteroids[j].size;
+					vector2 pos = asteroids[j].pos;
+
+					//do asteroid spawn twice
+					for (int a = j; a < j + (size - 1) + 1; a += (size - 1)) {
+						asteroids[a].pos = pos;
+						asteroids[a].vel.x = ((rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed);
+						asteroids[a].vel.y = ((rand() % (2 * maxAsteroidSpeed)) - maxAsteroidSpeed);
+						switch (rand() % 3) {
+						case 0:
+							asteroids[a].shapeType.numVertecies = 11;
+								for (int b = 0; b < 11; b++) {
+									asteroids[a].shapeType.vertecies[b] = asteroid1Vertecies[b];
+								}
+							break;
+						case 1:
+							asteroids[a].shapeType.numVertecies = 12;
+							for (int b = 0; b < 12; b++) {
+								asteroids[a].shapeType.vertecies[b] = asteroid2Vertecies[b];
+							}
+							break;
+						case 2:
+							asteroids[a].shapeType.numVertecies = 12;
+							for (int b = 0; b < 12; b++) {
+								asteroids[a].shapeType.vertecies[b] = asteroid3Vertecies[b];
+							}
+							break;
+						}
+						asteroids[a].r = rand() % 360;
+						asteroids[a].size = size - 1;
+						asteroids[a].alive = true;
+					}
+				}
 				continue;
+			}
+		}
+	}
+
+	//player killer
+	for (int i = 0; i < maxNumAsteroid; i++) {
+		if (asteroids[i].alive) {
+			//printf("%f ", dist(asteroids[i].pos.x, asteroids[i].pos.y, ship.pos.x, ship.pos.y));
+			if (dist(asteroids[i].pos.x, asteroids[i].pos.y, ship.pos.x, ship.pos.y) < ((3 * playerSize * asteroids[i].size / 2) + 3 * playerSize)) {
+				setup(difficulty);
+				//printf("death\n");
 			}
 		}
 	}
@@ -331,6 +385,20 @@ void update() {
 	for (int i = 0; i < maxNumBullets; i++) {
 		bullets[i].pos.x += bullets[i].vel.x * deltaTime;
 		bullets[i].pos.y += bullets[i].vel.y * deltaTime;
+	}
+
+	//increase difficulty
+	int diffIncrease = 0;
+	for (int i = 0; i < maxNumAsteroid; i++) {
+		if (asteroids[i].alive) {
+			diffIncrease++;
+		}
+	}
+	if (diffIncrease == 0) {
+		if (difficulty < maxDifficulty) {
+			difficulty++;
+		}
+		setup(difficulty);
 	}
 }
 
@@ -397,14 +465,14 @@ int main(int argc, char* argv[]) {
 	srand(time(NULL));
 
 	//Set isRunning variable to if window initizalized
-	int isRunning = initializeWindow();
+	isRunning = initializeWindow();
 
 	//Set up scene
-	setup();
+	setup(difficulty);
 
 	//Main Game Loop
 	while (isRunning) {
-		isRunning = processInput();
+		processInput();
 		update();
 		render();
 	}

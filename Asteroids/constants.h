@@ -12,6 +12,7 @@
 #define playerRotationSpeed 4
 #define accelFactor 0.75
 #define decelFactor 0.97
+#define initialLives 3
 
 #define maxDifficulty 8
 #define maxNumAsteroid 16 + maxDifficulty * 4
