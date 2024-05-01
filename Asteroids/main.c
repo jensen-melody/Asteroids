@@ -371,6 +371,7 @@ void update() {
 		if (asteroids[i].alive) {
 			//printf("%f ", dist(asteroids[i].pos.x, asteroids[i].pos.y, ship.pos.x, ship.pos.y));
 			if (dist(asteroids[i].pos.x, asteroids[i].pos.y, ship.pos.x, ship.pos.y) < ((3 * playerSize * asteroids[i].size / 2) + 3 * playerSize)) {
+				difficulty = 0;
 				setup(difficulty);
 				//printf("death\n");
 			}
